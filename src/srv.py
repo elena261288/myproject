@@ -11,7 +11,10 @@ print(f"port = {PORT}")
 class MyHandler(SimpleHTTPRequestHandler):
     def do_GET(self):
         if self.path == '/hello' or self.path == '/hello/':
-            msg = 'Hello, dear!'
+            msg = """
+            
+                     Hello, dear!
+                     """
             self.send_response(200)
             self.send_header("Content-type", "text/plain")
             self.send_header("Content-Length", len(msg))
