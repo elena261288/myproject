@@ -1,1 +1,1 @@
-web: python -m srv.py $PORT
+web: python srv.py
