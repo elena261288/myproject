@@ -1,10 +1,10 @@
 import socketserver
-import os
+import os   #
 from http.server import SimpleHTTPRequestHandler
 from urllib.parse import parse_qs
 from datetime import datetime
 
-PORT = int(os.getenv("PORT", 8000))
+PORT = int(os.getenv("PORT", 8000)) # задает адрес нашего локал хоста
 print(f"port = {PORT}")
 #now = datetime.now().year
 
