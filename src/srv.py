@@ -6,7 +6,7 @@ from datetime import datetime
 
 PORT = int(os.getenv("PORT", 8000)) # задает адрес нашего локал хоста
 print(f"port = {PORT}")
-#now = datetime.now().year
+now = datetime.now().year
 
 class MyHandler(SimpleHTTPRequestHandler):
     def do_GET(self):
@@ -32,7 +32,7 @@ class MyHandler(SimpleHTTPRequestHandler):
                 born = ' '
             else:
                 age = qs["age"][0]
-                year = str(2020 - int(age))
+                year = str(int(now) - int(age))
                 born = 'You were born in the ' + year + ' year'
 
             msg = f"""
