@@ -6,100 +6,79 @@ from datetime import datetime
 
 PORT = int(os.getenv("PORT", 8000))  # задает адрес нашего локал хоста
 print(f"port = {PORT}")
-now = int(datetime.now().year)
-time = int(datetime.now().hour)
-
 
 class MyHandler(SimpleHTTPRequestHandler):
-
-
     def do_GET(self):
-        if self.path == '/hello' or self.path == '/hello/':
-            msg = """
+        path = self.extract_path()
+        handlers = {
+            "hello": self.handler_hello,
+            "goodbye": self.handler_goodbye
+        }
+        default_handler = super().do_GET()
 
-                     Hello, dear!
-                     """
-            self.send_response(200)
-            self.send_header("Content-type", "text/plain")
-            self.send_header("Content-Length", len(msg))
-            self.end_headers()
-            self.wfile.write(msg.encode())
+        handler = handlers.get(path, default_handler)
+        handler()
 
-        elif self.path == '/goodbye' or self.path == '/goodbye/':
+    def handler_goodbye(self):
+        time = datetime.now().hour
+        parting = 'day' if time in range(9, 19) else 'night'
+        msg = f'Good {parting}!'
 
-            if 18 >= time and time <= 7:  #!!!
-                parting = "Good day"
-            else:
-                parting = "Good night"
+        self.respond(msg)
 
-            msg = f"""
-                    {parting}
-                    """
+    def handler_hello(self): #вытягиваем имя и возраст в хелло, сообщение
+        args = self.build_query_args()
+        name = self.build_name(args) #args.get("name", "dear")  #достать из словаря по ключу "имя"
+        age = self.build_age(args) #args.get("age")    #дастать из словаря значение по ключу "возраст"
 
-            self.send_response(200)
-            self.send_header("Content-type", "text/plain")
-            self.send_header("Content-Length", len(msg))
-            self.end_headers()
-            self.wfile.write(msg.encode())
+        msg = f'Hello, {name}!'
 
-        elif self.path.startswith("/hello"):
-            path, qs = self.path.split("?")
-            qs = parse_qs(qs)
-            if "name" not in qs:
-                name = 'dear'
-            else:
-                name = qs["name"][0]
-            if "age" not in qs:
-                born = ' '
-            else:
-                age = qs["age"][0]
-                year = str(now - int(age))
-                born = 'You were born in the ' + year + ' year'
+        if age:
+            nowy = datetime.now().year
+            year = nowy - int(age)
+            msg += f'\n You was born at {year}!'
 
-            msg = f"""
-                Hello, {name}!
-                {born}
-                """
+        self.respond(msg)
 
-            self.send_response(200)
-            self.send_header("Content-type", "text/plain")
-            self.send_header("Content-Length", len(msg))
-            self.end_headers()
+    def build_name(self, query_args):
+        return query_args.get("name", "Dear")
 
-            self.wfile.write(msg.encode())
+    def build_age(self, query_args):
+        return query_args.get("age")
 
-        elif self.path.startswith("/goodbye"):
-            if 18 >= time and time <= 7:  #!!!
-                parting = "Good day"
-            else:
-                parting = "Good night"
-            path, qs = self.path.split("?")
-            qs = parse_qs(qs)
-            if "name" not in qs:
-                name = 'dear'
-            else:
-                name = qs["name"][0]
-            if "age" not in qs:
-                born = ' '
-            else:
-                age = qs["age"][0]
-                year = str(now - int(age))
-                born = 'You were born in the ' + year + ' year'
+    def respond(self, msg): #ответ серверу
+        self.send_response(200)
+        self.send_header("Content-type", "text/plain")
+        self.send_header("Content-Length", str(len(msg)))
+        self.end_headers()
 
-            msg = f"""
-                {parting}, {name}!
-                {born}
-                """
+        self.wfile.write(msg.encode())
 
-            self.send_response(200)
-            self.send_header("Content-type", "text/plain")
-            self.send_header("Content-Length", len(msg))
-            self.end_headers()
+    def build_query_args(self): #разбиваем qs на словарь qs
+        _path, *qs = self.path.split('?')
+        args = {}
 
-            self.wfile.write(msg.encode())
-        else:
-            return SimpleHTTPRequestHandler.do_GET(self)
+        if len(qs) != 1:
+            return args
 
+        qs = qs[0] #преобразовали из списка в строку
+        qs = parse_qs(qs)
+
+        for key, value in qs.items(): # для каждой сцепки "ключ-знач" выполнить...
+            if not value:
+                continue
+            args[key] = value[0]
+        return args
+
+    def extract_path(self): #выделяем из всего пути начало
+        path = self.path.split('/')[1]
+        path = path.split("?")[0]
+        return path.split("#")[0]
+        #patha, *_qs = self.path.split('?')
+        #pathb, *_qs = patha.split('#')
+        #if pathb[-1] == '/':
+         #   path = pathb[:-1]
+        #return path
 
 
 with socketserver.TCPServer(("", PORT), MyHandler) as httpd:
