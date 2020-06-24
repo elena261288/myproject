@@ -12,7 +12,12 @@ class MyHandler(SimpleHTTPRequestHandler):
         path = self.extract_path()
         handlers = {
             "hello": self.handler_hello,
-            "goodbye": self.handler_goodbye
+            "goodbye": self.handler_goodbye,
+            #"my_resume": self.handler_resume,
+            #"my_education": self.handler_education,
+            #"my_job": self.handler_job
+
+
         }
         default_handler = super().do_GET
 
