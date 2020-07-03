@@ -1,12 +1,13 @@
 import json
+import os
 import socketserver
 from http.server import SimpleHTTPRequestHandler
 from urllib.parse import parse_qs
 from datetime import datetime
 from errors import NotFound, MethodNotAllowed, UnknownPath
-from constants import PORT, MYPROJECT_DIR, PAGES_DIR, COUNTER
-from responds import respond, respond_404, respond_405, respond_500
-
+from constants import PORT, MYPROJECT_DIR, PAGES_DIR, COUNTER, SESSION
+from responds import respond_200, respond_404, respond_405, respond_500, respond_302
+from http import cookies
 
 
 print(f"port = {PORT}")
@@ -62,19 +63,19 @@ class MyHandler(SimpleHTTPRequestHandler):
             msg = cont_html.format(page=page, visits=visits)
             # msg = json.dumps(job_json, sort_keys=True, indent=4)
             html += msg
-        respond(self, html, "text/html")
+        respond_200(self, html, "text/html")
 
     def handler_index(self, method):
         self.visits_counter()
         html = MYPROJECT_DIR/"index.html"
         content = self.get_content(html)
-        respond(self, content, "text/html")
+        respond_200(self, content, "text/html")
 
     def handler_skills(self, method):
         self.visits_counter()
         html = PAGES_DIR/"skills"/"index.html"
         content = self.get_content(html)
-        respond(self, "text/html", content)
+        respond_200(self, content, "text/html")
 
     def get_content(self, fp):
         if not fp.is_file():
@@ -89,7 +90,7 @@ class MyHandler(SimpleHTTPRequestHandler):
         self.visits_counter()
         html = PAGES_DIR / "education" / "index.html"
         content = self.get_content(html)
-        respond(self, content, "text/html")
+        respond_200(self, content, "text/html")
 
     def handler_job(self, method):
         self.visits_counter()
@@ -104,7 +105,7 @@ class MyHandler(SimpleHTTPRequestHandler):
             msg = cont_html.format(name=name, started=started, ended=ended)
             #msg = json.dumps(job_json, sort_keys=True, indent=4)
             html += msg
-        respond(self, html, "text/html")
+        respond_200(self, html, "text/html")
 
     def load_json_file(self, fj):
         with fj.open("r") as j:
@@ -116,7 +117,7 @@ class MyHandler(SimpleHTTPRequestHandler):
         parting = 'day' if time in range(9, 19) else 'night'
         msg = f'Good {parting}!'
 
-        respond(self, msg, "text/plain")
+        respond_200(self, msg, "text/plain")
 
     def visits_counter(self):
         stats = self.get_json(COUNTER)
@@ -140,35 +141,89 @@ class MyHandler(SimpleHTTPRequestHandler):
             return {}
 
 
-    def handler_hello(self, method): #вытягиваем имя и возраст в хелло, сообщение
+    def handler_hello(self, method):
         self.visits_counter()
-        args = self.build_query_args()
-        name = self.build_name(args) #args.get("name", "dear")  #достать из словаря по ключу "имя"
-        age = self.build_age(args) #args.get("age")    #дастать из словаря значение по ключу "возраст"
+        switcher = {
+            'get': self.hello_GEThandler,
+            'post': self.hello_POSThandler
+        }
+        try:
+            switcher = switcher[method]
+            return switcher()
+        except Exception:
+            raise MethodNotAllowed
 
-        msg = f'Hello, {name}!'
+    def hello_POSThandler(self):
+        form = self.get_form()
+        print(form)
+        session = self.load_user_session()
+        session.update(form)
+        session_id = self.save_user_session(session)
+        respond_302(self, "hello", session_id)
 
+    def save_user_session(self, session):
+        session_id = self.get_session_id() or os.urandom(16).hex()
+        sessions = self.get_json(SESSION)
+        sessions[session_id] = session
+        self.save_stats(sessions)
+
+        return session_id
+
+    def save_stats(self, stats):
+            with SESSION.open("w") as fp:
+                json.dump(stats, fp)
+
+    def get_form(self): #???
+        try:
+            content_length = int(self.headers["Content-Length"])
+            data = self.rfile.read(content_length)
+        except Exception:
+            data = ""
+        payload = data.decode()
+        qs = parse_qs(payload)
+        result = {}
+        for key, values in qs.items():
+            if not values:
+                continue
+
+            result[key] = values[0]
+        return result
+
+
+
+    def hello_GEThandler(self):
+        sessions = self.load_user_session() or self.build_query_args()
+        name = self.build_name(sessions)
+        age = self.build_age(sessions)
+        born = None
         if age:
-            nowy = datetime.now().year
-            year = nowy - int(age)
-            msg += f'\n You was born at {year}!'
+            year = datetime.now().year
+            born = year - age
 
-        respond(self, msg, "text/plain")
+        html_file = PAGES_DIR/"hello" / "index.html"
+        cont_html = self.get_content(html_file).format(name=name, year=born)
+        respond_200(self, cont_html, "text/html")
+
+
+    def load_user_session(self):
+        session_id = self.get_session_id()
+        if not session_id:
+            return {}
+        session = self.get_json()
+        return session.get(session_id, {})
+
+    def get_session_id(self):
+        cookie = self.headers.get("Cookie")
+        if not cookie:
+            return {}
+
+        return cookie
 
     def build_name(self, query_args):
         return query_args.get("name", "Dear")
 
     def build_age(self, query_args):
         return query_args.get("age")
-
-    #def resp(self, msg, mistake,content_type="text/plain"):
-     #   self.send_response(mistake)
-      #  self.send_header("Content-type", content_type)
-      #  self.send_header("Content-Length", str(len(msg)))
-     #   self.end_headers()
-
-     #   self.wfile.write(msg.encode())
-
 
     def build_query_args(self): #разбиваем qs на словарь qs
         _path, *qs = self.path.split('?')
@@ -183,6 +238,7 @@ class MyHandler(SimpleHTTPRequestHandler):
         for key, value in qs.items(): # для каждого картежа "ключ-знач" выполнить...
             if not value:
                 continue
+
             args[key] = value[0]
         return args
 
@@ -190,12 +246,6 @@ class MyHandler(SimpleHTTPRequestHandler):
         path = self.path.split('/')[1]
         path = path.split("?")[0]
         return path.split("#")[0]
-        #patha = self.path.split('?')[0]
-        #pathb, *_qs = patha.split('#')[0]
-        #if pathb[-1] == '/':
-        #    path = pathb[:-1]
-        #return path
-
 
 with socketserver.TCPServer(("", PORT), MyHandler) as httpd:
     print("it works")

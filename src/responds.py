@@ -1,4 +1,6 @@
-def respond(path, msg, content_type="text/plain"):
+from http import cookies
+
+def respond_200(path, msg, content_type="text/plain"):
     aaa = msg.encode()
     path.send_response(200)
     path.send_header("Content-type", content_type)
@@ -35,3 +37,19 @@ def respond_500(self):  # ответ серверу об ошибке 500
     self.end_headers()
 
     self.wfile.write(msg.encode())
+
+def respond_302(self, redirect,cookie):
+    self.respond("", 302, "text/plain", redirect, cookie)
+
+def respond(self, msg, status_code, content_type="text/plain", redirect="", cookie=""):
+    self.send_response(status_code)
+    self.send_header("Content-type", content_type)
+    self.send_header("Content-length", str(len(msg)))
+    self.send_header("Location", redirect)
+    self.send_header("Set-Cookie", cookie)
+    self.end_headers()
+
+    if isinstance(msg, str):
+        msg = msg.encode()
+    self.wfile.write(msg)
+
