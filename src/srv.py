@@ -30,7 +30,6 @@ class MyHandler(SimpleHTTPRequestHandler):
             #super().do_POST()
 
     def separation_header(self, method):
-        self.visits_counter()
         path = self.extract_path()
 
         handlers = {
@@ -40,7 +39,7 @@ class MyHandler(SimpleHTTPRequestHandler):
             "education": self.handler_education,
             "job": self.handler_job,
             "": self.handler_index,
-            #"/": self.handler_index
+            "counter": self.handler_count
         }
 
         handler = handlers[path]
@@ -52,6 +51,18 @@ class MyHandler(SimpleHTTPRequestHandler):
             respond_405(self)
         except Exception:
             respond_500(self)
+
+    def handler_count(self, method):
+        json_file = PAGES_DIR / "counter" / "counter.json"
+        html_file = PAGES_DIR / "counter" / "index.html"
+        job_json = self.load_json_file(json_file)
+        cont_html = self.get_content(html_file)
+        html = ""
+        for page, visits in job_json.items():
+            msg = cont_html.format(page=page, visits=visits)
+            # msg = json.dumps(job_json, sort_keys=True, indent=4)
+            html += msg
+        respond(self, html, "text/html")
 
     def handler_index(self, method):
         self.visits_counter()
@@ -73,8 +84,6 @@ class MyHandler(SimpleHTTPRequestHandler):
             con = src.read()
 
         return con
-
-
 
     def handler_education(self, method):
         self.visits_counter()
@@ -110,22 +119,23 @@ class MyHandler(SimpleHTTPRequestHandler):
         respond(self, msg, "text/plain")
 
     def visits_counter(self):
-        args = self.get_json(COUNTER)
+        stats = self.get_json(COUNTER)
         path = self.extract_path()
-        if path not in args:
-            args[path] = 0
-        args[path] += 1
-        self.save_data(args)
+        #visits = stats.setdefault(datetime.now().strftime("%Y-%m-%d"), {})
+        if path not in stats:
+            stats[path] = 1
+        stats[path] += 1
+        self.save_data(stats)
 
-    def save_data(self, args):
+    def save_data(self, stats):
         with COUNTER.open("w") as fp:
-            json.dump(args, fp)
+            json.dump(stats, fp)
 
 
     def get_json(self, file_inf):
         try:
             with file_inf.open("r", encoding="utf-8") as usf:
-                return json.load(usf)  # what does load?
+                return json.load(usf)
         except (json.JSONDecodeError, FileNotFoundError):
             return {}
 
