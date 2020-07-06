@@ -14,21 +14,21 @@ print(f"port = {PORT}")
 print(f"{MYPROJECT_DIR=}")
 print(f"{PAGES_DIR=}")
 
-class MyHandler(SimpleHTTPRequestHandler):
 
+class MyHandler(SimpleHTTPRequestHandler):
     def do_GET(self):
         try:
             self.separation_header("get")
         except UnknownPath:
             respond_404(self)
-            #super().do_GET()
+            # super().do_GET()
 
     def do_POST(self):
         try:
             self.separation_header("post")
         except UnknownPath:
             respond_404(self)
-            #super().do_POST()
+            # super().do_POST()
 
     def separation_header(self, method):
         path = self.extract_path()
@@ -40,7 +40,7 @@ class MyHandler(SimpleHTTPRequestHandler):
             "education": self.handler_education,
             "job": self.handler_job,
             "": self.handler_index,
-            "counter": self.handler_count
+            "counter": self.handler_count,
         }
 
         handler = handlers[path]
@@ -52,6 +52,7 @@ class MyHandler(SimpleHTTPRequestHandler):
             respond_405(self)
         except Exception:
             import traceback
+
             traceback.print_exc()
             respond_500(self)
 
@@ -69,13 +70,13 @@ class MyHandler(SimpleHTTPRequestHandler):
 
     def handler_index(self, method):
         self.visits_counter()
-        html = MYPROJECT_DIR/"index.html"
+        html = MYPROJECT_DIR / "index.html"
         content = self.get_content(html)
         respond_200(self, content, "text/html")
 
     def handler_skills(self, method):
         self.visits_counter()
-        html = PAGES_DIR/"skills"/"index.html"
+        html = PAGES_DIR / "skills" / "index.html"
         content = self.get_content(html)
         respond_200(self, content, "text/html")
 
@@ -83,7 +84,7 @@ class MyHandler(SimpleHTTPRequestHandler):
         if not fp.is_file():
             raise NotFound
 
-        with fp.open('r', encoding='utf-8') as src:
+        with fp.open("r", encoding="utf-8") as src:
             con = src.read()
 
         return con
@@ -102,10 +103,10 @@ class MyHandler(SimpleHTTPRequestHandler):
         cont_html = self.get_content(html_file)
         html = ""
         for name, dates in job_json.items():
-            started = dates['start']
-            ended = dates['end'] or "now"
+            started = dates["start"]
+            ended = dates["end"] or "now"
             msg = cont_html.format(name=name, started=started, ended=ended)
-            #msg = json.dumps(job_json, sort_keys=True, indent=4)
+            # msg = json.dumps(job_json, sort_keys=True, indent=4)
             html += msg
         respond_200(self, html, "text/html")
 
@@ -116,15 +117,15 @@ class MyHandler(SimpleHTTPRequestHandler):
     def handler_goodbye(self, method):
         self.visits_counter()
         time = datetime.now().hour
-        parting = 'day' if time in range(9, 19) else 'night'
-        msg = f'Good {parting}!'
+        parting = "day" if time in range(9, 19) else "night"
+        msg = f"Good {parting}!"
 
         respond_200(self, msg, "text/plain")
 
     def visits_counter(self):
         stats = self.get_json(COUNTER)
         path = self.extract_path()
-        #visits = stats.setdefault(datetime.now().strftime("%Y-%m-%d"), {})
+        # visits = stats.setdefault(datetime.now().strftime("%Y-%m-%d"), {})
         if path not in stats:
             stats[path] = 1
         stats[path] += 1
@@ -134,7 +135,6 @@ class MyHandler(SimpleHTTPRequestHandler):
         with COUNTER.open("w") as fp:
             json.dump(stats, fp)
 
-
     def get_json(self, file_inf):
         try:
             with file_inf.open("r", encoding="utf-8") as usf:
@@ -142,13 +142,9 @@ class MyHandler(SimpleHTTPRequestHandler):
         except (json.JSONDecodeError, FileNotFoundError):
             return {}
 
-
     def handler_hello(self, method):
         self.visits_counter()
-        switcher = {
-            'get': self.hello_GEThandler,
-            'post': self.hello_POSThandler
-        }
+        switcher = {"get": self.hello_GEThandler, "post": self.hello_POSThandler}
         switcher = switcher[method]
         return switcher()
 
@@ -168,10 +164,10 @@ class MyHandler(SimpleHTTPRequestHandler):
         return session_id
 
     def save_stats(self, stats):
-            with SESSION.open("w") as fp:
-                json.dump(stats, fp)
+        with SESSION.open("w") as fp:
+            json.dump(stats, fp)
 
-    def get_form(self): #???
+    def get_form(self):  # ???
         try:
             content_length = int(self.headers["Content-Length"])
             data = self.rfile.read(content_length)
@@ -187,8 +183,6 @@ class MyHandler(SimpleHTTPRequestHandler):
             result[key] = values[0]
         return result
 
-
-
     def hello_GEThandler(self):
         sessions = self.load_user_session() or self.build_query_args()
         name = self.build_name(sessions)
@@ -198,10 +192,9 @@ class MyHandler(SimpleHTTPRequestHandler):
             year = datetime.now().year
             born = year - int(age)
 
-        html_file = PAGES_DIR/"hello" / "index.html"
+        html_file = PAGES_DIR / "hello" / "index.html"
         cont_html = self.get_content(html_file).format(name=name, year=born)
         respond_200(self, cont_html, "text/html")
-
 
     def load_user_session(self):
         session_id = self.get_session_id()
@@ -224,27 +217,28 @@ class MyHandler(SimpleHTTPRequestHandler):
     def build_age(self, query_args):
         return query_args.get("age")
 
-    def build_query_args(self): #разбиваем qs на словарь qs
-        _path, *qs = self.path.split('?')
+    def build_query_args(self):  # разбиваем qs на словарь qs
+        _path, *qs = self.path.split("?")
         args = {}
 
         if len(qs) != 1:
             return args
 
-        qs = qs[0] #преобразовали из списка в строку
+        qs = qs[0]  # преобразовали из списка в строку
         qs = parse_qs(qs)
 
-        for key, value in qs.items(): # для каждого картежа "ключ-знач" выполнить...
+        for key, value in qs.items():  # для каждого картежа "ключ-знач" выполнить...
             if not value:
                 continue
 
             args[key] = value[0]
         return args
 
-    def extract_path(self): #выделяем из всего пути начало
-        path = self.path.split('/')[1]
+    def extract_path(self):  # выделяем из всего пути начало
+        path = self.path.split("/")[1]
         path = path.split("?")[0]
         return path.split("#")[0]
+
 
 with socketserver.TCPServer(("", PORT), MyHandler) as httpd:
     print("it works")
