@@ -39,7 +39,7 @@ def respond_500(self):  # ответ серверу об ошибке 500
     self.wfile.write(msg.encode())
 
 def respond_302(self, redirect,cookie):
-    self.respond("", 302, "text/plain", redirect, cookie)
+    respond(self, "", 302, "text/plain", redirect, cookie)
 
 def respond(self, msg, status_code, content_type="text/plain", redirect="", cookie=""):
     self.send_response(status_code)

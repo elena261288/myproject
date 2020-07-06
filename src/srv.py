@@ -51,6 +51,8 @@ class MyHandler(SimpleHTTPRequestHandler):
         except MethodNotAllowed:
             respond_405(self)
         except Exception:
+            import traceback
+            traceback.print_exc()
             respond_500(self)
 
     def handler_count(self, method):
@@ -147,15 +149,11 @@ class MyHandler(SimpleHTTPRequestHandler):
             'get': self.hello_GEThandler,
             'post': self.hello_POSThandler
         }
-        try:
-            switcher = switcher[method]
-            return switcher()
-        except Exception:
-            raise MethodNotAllowed
+        switcher = switcher[method]
+        return switcher()
 
     def hello_POSThandler(self):
         form = self.get_form()
-        print(form)
         session = self.load_user_session()
         session.update(form)
         session_id = self.save_user_session(session)
@@ -198,7 +196,7 @@ class MyHandler(SimpleHTTPRequestHandler):
         born = None
         if age:
             year = datetime.now().year
-            born = year - age
+            born = year - int(age)
 
         html_file = PAGES_DIR/"hello" / "index.html"
         cont_html = self.get_content(html_file).format(name=name, year=born)
@@ -209,13 +207,14 @@ class MyHandler(SimpleHTTPRequestHandler):
         session_id = self.get_session_id()
         if not session_id:
             return {}
-        session = self.get_json()
+        session = self.get_json(SESSION)
         return session.get(session_id, {})
 
     def get_session_id(self):
         cookie = self.headers.get("Cookie")
         if not cookie:
             return {}
+        cookie = cookie.split(";")[0]
 
         return cookie
 
