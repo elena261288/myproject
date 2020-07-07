@@ -1,14 +1,15 @@
 import json
 import os
 import socketserver
+from datetime import datetime
+from http import cookies
 from http.server import SimpleHTTPRequestHandler
 from urllib.parse import parse_qs
-from datetime import datetime
-from errors import NotFound, MethodNotAllowed, UnknownPath
-from constants import PORT, MYPROJECT_DIR, PAGES_DIR, COUNTER, SESSION
-from responds import respond_200, respond_404, respond_405, respond_500, respond_302
-from http import cookies
 
+from constants import COUNTER, MYPROJECT_DIR, PAGES_DIR, PORT, SESSION
+from errors import MethodNotAllowed, NotFound, UnknownPath
+from responds import (respond_200, respond_302, respond_404, respond_405,
+                      respond_500)
 
 print(f"port = {PORT}")
 print(f"{MYPROJECT_DIR=}")
@@ -21,14 +22,12 @@ class MyHandler(SimpleHTTPRequestHandler):
             self.separation_header("get")
         except UnknownPath:
             respond_404(self)
-            # super().do_GET()
 
     def do_POST(self):
         try:
             self.separation_header("post")
         except UnknownPath:
             respond_404(self)
-            # super().do_POST()
 
     def separation_header(self, method):
         path = self.extract_path()
@@ -52,9 +51,7 @@ class MyHandler(SimpleHTTPRequestHandler):
             respond_405(self)
         except Exception:
             import traceback
-
-            traceback.print_exc()
-            respond_500(self)
+            respond_500(self, traceback.format_exc())
 
     def handler_count(self, method):
         json_file = PAGES_DIR / "counter" / "counter.json"
@@ -64,7 +61,7 @@ class MyHandler(SimpleHTTPRequestHandler):
         html = ""
         for page, visits in job_json.items():
             msg = cont_html.format(page=page, visits=visits)
-            # msg = json.dumps(job_json, sort_keys=True, indent=4)
+            #msg = json.dumps(job_json, sort_keys=True, indent=4)
             html += msg
         respond_200(self, html, "text/html")
 
@@ -125,10 +122,10 @@ class MyHandler(SimpleHTTPRequestHandler):
     def visits_counter(self):
         stats = self.get_json(COUNTER)
         path = self.extract_path()
-        # visits = stats.setdefault(datetime.now().strftime("%Y-%m-%d"), {})
-        if path not in stats:
-            stats[path] = 1
-        stats[path] += 1
+        visits = stats.setdefault(datetime.now().strftime("%Y-%m-%d"), {})
+        if path not in visits:
+            visits[path] = 0
+        visits[path] += 1
         self.save_data(stats)
 
     def save_data(self, stats):
@@ -145,8 +142,8 @@ class MyHandler(SimpleHTTPRequestHandler):
     def handler_hello(self, method):
         self.visits_counter()
         switcher = {"get": self.hello_GEThandler, "post": self.hello_POSThandler}
-        switcher = switcher[method]
-        return switcher()
+        handler = switcher[method]
+        return handler()
 
     def hello_POSThandler(self):
         form = self.get_form()
@@ -159,13 +156,13 @@ class MyHandler(SimpleHTTPRequestHandler):
         session_id = self.get_session_id() or os.urandom(16).hex()
         sessions = self.get_json(SESSION)
         sessions[session_id] = session
-        self.save_stats(sessions)
+        self.save_id(sessions)
 
         return session_id
 
-    def save_stats(self, stats):
+    def save_id(self, id):
         with SESSION.open("w") as fp:
-            json.dump(stats, fp)
+            json.dump(id, fp)
 
     def get_form(self):  # ???
         try:

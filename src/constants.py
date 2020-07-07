@@ -1,6 +1,5 @@
-from pathlib import Path
 import os
-
+from pathlib import Path
 
 PORT = int(os.getenv("PORT", 8000))  # задает адрес нашего локал хоста
 MYPROJECT_DIR = Path(__file__).parent.parent.resolve()

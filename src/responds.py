@@ -11,48 +11,55 @@ def respond_200(path, msg, content_type="text/plain"):
     path.wfile.write(aaa)
 
 
-def respond_404(self):
+def respond_404(server):
     msg = "File not found. Try searching elsewhere"
-    self.send_response(404)
-    self.send_header("Content-type", "text/plain")
-    self.send_header("Content-Length", str(len(msg)))
-    self.end_headers()
+    server.send_response(404)
+    server.send_header("Content-type", "text/plain")
+    server.send_header("Content-Length", str(len(msg)))
+    server.end_headers()
 
-    self.wfile.write(msg.encode())
+    server.wfile.write(msg.encode())
 
 
-def respond_405(self):  # ответ серверу об ошибке 405
+def respond_405(srv):  # ответ серверу об ошибке 405
     msg = "Method Not Allowed!"
-    self.send_response(405)
-    self.send_header("Content-type", "text/plain")
-    self.send_header("Content-Length", str(len(msg)))
-    self.end_headers()
+    srv.send_response(405)
+    srv.send_header("Content-type", "text/plain")
+    srv.send_header("Content-Length", str(len(msg)))
+    srv.end_headers()
 
-    self.wfile.write(msg.encode())
-
-
-def respond_500(self):  # ответ серверу об ошибке 500
-    msg = "Method Not Allowed!"
-    self.send_response(500)
-    self.send_header("Content-type", "text/plain")
-    self.send_header("Content-Length", str(len(msg)))
-    self.end_headers()
-
-    self.wfile.write(msg.encode())
+    srv.wfile.write(msg.encode())
 
 
-def respond_302(self, redirect, cookie):
-    respond(self, "", 302, "text/plain", redirect, cookie)
+def respond_500(srv, exc=''):  # ответ серверу об ошибке 500
+    msg = f"""
+    <h1>Internal Server Error</h1>
+    <hr>
+    <pre>
+    {exc}
+    </pre>
+    <hr>
+    """
+    srv.send_response(500)
+    srv.send_header("Content-type", "text/plain")
+    srv.send_header("Content-Length", str(len(msg)))
+    srv.end_headers()
+
+    srv.wfile.write(msg.encode())
 
 
-def respond(self, msg, status_code, content_type="text/plain", redirect="", cookie=""):
-    self.send_response(status_code)
-    self.send_header("Content-type", content_type)
-    self.send_header("Content-length", str(len(msg)))
-    self.send_header("Location", redirect)
-    self.send_header("Set-Cookie", cookie)
-    self.end_headers()
+def respond_302(server, redirect, cookie):
+    respond(server, "", 302, "text/plain", redirect, cookie)
+
+
+def respond(srv, msg, status_code, content_type="text/plain", redirect="", cookie=""):
+    srv.send_response(status_code)
+    srv.send_header("Content-type", content_type)
+    srv.send_header("Content-length", str(len(msg)))
+    srv.send_header("Location", redirect)
+    srv.send_header("Set-Cookie", cookie)
+    srv.end_headers()
 
     if isinstance(msg, str):
         msg = msg.encode()
-    self.wfile.write(msg)
+    srv.wfile.write(msg)
