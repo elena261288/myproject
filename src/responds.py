@@ -41,7 +41,7 @@ def respond_500(srv, exc=''):  # ответ серверу об ошибке 500
     <hr>
     """
     srv.send_response(500)
-    srv.send_header("Content-type", "text/plain")
+    srv.send_header("Content-type", "text/html")
     srv.send_header("Content-Length", str(len(msg)))
     srv.end_headers()
 
