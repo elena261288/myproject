@@ -9,7 +9,7 @@ from project.utils import get_content, load_json_file
 def handler_index(request):
     html = MYPROJECT_DIR / "index.html"
     content = get_content(request, html)
-    return HttpResponse(html)
+    return HttpResponse(content, html)
 
 
 def handler_goodbye(request):
