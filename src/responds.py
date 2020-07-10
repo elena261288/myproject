@@ -31,7 +31,7 @@ def respond_405(srv):  # ответ серверу об ошибке 405
     srv.wfile.write(msg.encode())
 
 
-def respond_500(srv, exc=''):  # ответ серверу об ошибке 500
+def respond_500(srv, exc=""):  # ответ серверу об ошибке 500
     msg = f"""
     <h1>Internal Server Error</h1>
     <hr>

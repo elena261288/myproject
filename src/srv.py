@@ -8,8 +8,7 @@ from urllib.parse import parse_qs
 
 from constants import COUNTER, MYPROJECT_DIR, PAGES_DIR, PORT, SESSION
 from errors import MethodNotAllowed, NotFound, UnknownPath
-from responds import (respond_200, respond_302, respond_404, respond_405,
-                      respond_500)
+from responds import respond_200, respond_302, respond_404, respond_405, respond_500
 
 print(f"port = {PORT}")
 print(f"{MYPROJECT_DIR=}")
@@ -51,16 +50,22 @@ class MyHandler(SimpleHTTPRequestHandler):
             respond_405(self)
         except Exception:
             import traceback
+
             respond_500(self, traceback.format_exc())
 
     def handler_count(self, method):
-        #COUNTER = PAGES_DIR / "counter" / "counter.json"
+        # COUNTER = PAGES_DIR / "counter" / "counter.json"
         t = datetime.now()
         html_file = PAGES_DIR / "counter" / "index.html"
         cont_json = self.load_json_file(COUNTER)
         cont_html = self.get_content(html_file)
         html = ""
-        for dates, stats in cont_json.items():      #распаковали словарь дата: остальное, перевили дату в читабельный вид
+        for (
+            dates,
+            stats,
+        ) in (
+            cont_json.items()
+        ):  # распаковали словарь дата: остальное, перевили дату в читабельный вид
             print(dates)
             date = datetime.strptime(dates, "%Y-%m-%d")
             cont_json[date] = stats
@@ -72,7 +77,7 @@ class MyHandler(SimpleHTTPRequestHandler):
                     today[p] = today.get(p, 0) + v
         for page, visits in cont_json.items():
             msg = cont_html.format(page=page, visits=visits)
-            #msg = json.dumps(job_json, sort_keys=True, indent=4)
+            # msg = json.dumps(job_json, sort_keys=True, indent=4)
             html += msg
         respond_200(self, html, "text/html")
 
@@ -138,7 +143,6 @@ class MyHandler(SimpleHTTPRequestHandler):
             visits[path] = 0
         visits[path] += 1
         self.save_data(stats)
-
 
     def save_data(self, stats):
         with COUNTER.open("w") as fp:
