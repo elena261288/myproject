@@ -58,26 +58,20 @@ class MyHandler(SimpleHTTPRequestHandler):
         t = datetime.now()
         html_file = PAGES_DIR / "counter" / "index.html"
         cont_json = self.load_json_file(COUNTER)
+        #cont_json = self.get_json(COUNTER)
         cont_html = self.get_content(html_file)
         html = ""
-        for (
-            dates,
-            stats,
-        ) in (
-            cont_json.items()
-        ):  # распаковали словарь дата: остальное, перевили дату в читабельный вид
-            print(dates)
-            date = datetime.strptime(dates, "%Y-%m-%d")
-            cont_json[date] = stats
-            del cont_json[dates]
-        today = {}
-        for d, s in cont_json.items():
-            if d.date() == t.date():
-                for p, v in s.items():
-                    today[p] = today.get(p, 0) + v
+        #for (dates, stats) in cont_json.items():  # распаковали словарь дата: остальное, перевили дату в читабельный вид
+        #    dates = datetime.strptime(dates, "%Y-%m-%d")
+        #    cont_json[dates] = stats
+        #    #del cont_json[dates]
+        #today = {}
+        #for d, s in cont_json.items():
+        #    if d.date() == t.date():
+        #        for p, v in s.items():
+         #           today[p] = today.get(p, 0) + v
         for page, visits in cont_json.items():
             msg = cont_html.format(page=page, visits=visits)
-            # msg = json.dumps(job_json, sort_keys=True, indent=4)
             html += msg
         respond_200(self, html, "text/html")
 
@@ -138,10 +132,10 @@ class MyHandler(SimpleHTTPRequestHandler):
     def visits_counter(self):
         stats = self.get_json(COUNTER)
         path = self.extract_path()
-        visits = stats.setdefault(datetime.now().strftime("%Y-%m-%d"), {})
-        if path not in visits:
-            visits[path] = 0
-        visits[path] += 1
+        #visits = stats.setdefault(datetime.now().strftime("%Y-%m-%d"), {})
+        if path not in stats:
+            stats[path] = 0
+        stats[path] += 1
         self.save_data(stats)
 
     def save_data(self, stats):
