@@ -8,6 +8,7 @@ from urllib.parse import parse_qs
 
 from constants import COUNTER, MYPROJECT_DIR, PAGES_DIR, PORT, SESSION
 from errors import MethodNotAllowed, NotFound, UnknownPath
+from project.constants import THEME
 from responds import respond_200, respond_302, respond_404, respond_405, respond_500
 
 print(f"port = {PORT}")
@@ -38,6 +39,7 @@ class MyHandler(SimpleHTTPRequestHandler):
             "education": self.handler_education,
             "job": self.handler_job,
             "": self.handler_index,
+            "theme": self.handler_theme,
             "counter": self.handler_count,
         }
 
@@ -54,8 +56,7 @@ class MyHandler(SimpleHTTPRequestHandler):
             respond_500(self, traceback.format_exc())
 
     def handler_count(self, method):
-        # COUNTER = PAGES_DIR / "counter" / "counter.json"
-        t = datetime.now()
+        #t = datetime.now()
         html_file = PAGES_DIR / "counter" / "index.html"
         cont_json = self.load_json_file(COUNTER)
         #cont_json = self.get_json(COUNTER)
@@ -155,16 +156,79 @@ class MyHandler(SimpleHTTPRequestHandler):
         handler = switcher[method]
         return handler()
 
+
+    def hello_GEThandler(self):
+        sessions = self.load_user_session(SESSION) or self.build_query_args()
+        name = self.build_name(sessions)
+        age = self.build_age(sessions)
+        born = None
+        if age:
+            year = datetime.now().year
+            born = year - int(age)
+
+        html_file = PAGES_DIR / "hello" / "index.html"
+        cont_html = self.get_content(html_file).format(name=name, year=born)
+        respond_200(self, cont_html, "text/html")
+
+
     def hello_POSThandler(self):
         form = self.get_form()
-        session = self.load_user_session()
+        session = self.load_user_session(SESSION)
         session.update(form)
-        session_id = self.save_user_session(session)
+        session_id = self.save_user_session(SESSION, session)
         respond_302(self, "hello", session_id)
 
-    def save_user_session(self, session):
+    def handler_theme(self, method):
+        switcher = {"get": self.theme_GEThandler,
+                    "post": self.theme_POSThandler}
+        handler = switcher[method]
+        return handler()
+
+    def theme_GEThandler(self):
+        sessions = self.load_user_session(THEME)
+        if not sessions:
+            sessions = self.get_default_theme()
+
+        html_file = PAGES_DIR / "theme" / "index.html"
+        theme_page = self.get_content(html_file).format(**sessions)
+        respond_200(self, theme_page, "text/html")
+
+
+    def theme_POSThandler(self):
+        sessions = self.load_user_session(THEME)
+        if not sessions:
+            sessions = self.get_default_theme()
+
+        self.switch_theme(sessions)
+
+        session_id = self.save_user_session(THEME, sessions)
+        respond_302(self, "theme", session_id)
+
+    def switch_theme(self, theme):
+        if theme["background_color"] == "PaleTurquoise":
+            theme["background_color"] = "teal"
+            theme["h1_color"] = "LightSalmon"
+            theme["color"] = "white"
+        else:
+            theme["background_color"] = "PaleTurquoise"
+            theme["h1_color"] = "Tan"
+            theme["color"] = "Black"
+        return theme
+
+    def get_default_theme(self):
+        theme = {}
+        theme.update({
+            "background_color": "PaleTurquoise",
+            "h1_color": "Tan",
+            "color": "black"})
+        return theme
+
+
+
+
+    def save_user_session(self, fj, session):
         session_id = self.get_session_id() or os.urandom(16).hex()
-        sessions = self.get_json(SESSION)
+        sessions = self.get_json(fj)
         sessions[session_id] = session
         self.save_id(sessions)
 
@@ -190,24 +254,12 @@ class MyHandler(SimpleHTTPRequestHandler):
             result[key] = values[0]
         return result
 
-    def hello_GEThandler(self):
-        sessions = self.load_user_session() or self.build_query_args()
-        name = self.build_name(sessions)
-        age = self.build_age(sessions)
-        born = None
-        if age:
-            year = datetime.now().year
-            born = year - int(age)
 
-        html_file = PAGES_DIR / "hello" / "index.html"
-        cont_html = self.get_content(html_file).format(name=name, year=born)
-        respond_200(self, cont_html, "text/html")
-
-    def load_user_session(self):
+    def load_user_session(self, file):
         session_id = self.get_session_id()
         if not session_id:
             return {}
-        session = self.get_json(SESSION)
+        session = self.get_json(file)
         return session.get(session_id, {})
 
     def get_session_id(self):
