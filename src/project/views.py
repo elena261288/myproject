@@ -7,7 +7,7 @@ from django.shortcuts import redirect
 from django.views.decorators.http import require_http_methods
 
 from project.utils import load_user_session, build_query_args, build_name, build_age, get_content, load_json_file, \
-    get_form, save_user_session
+    get_form, save_user_session, get_theme, switch_theme
 
 SESSION = settings.PAGES_DIR / "hello" / "session.json"
 
@@ -51,7 +51,7 @@ def handle_hello_post(request):
     session.update(form)
     session_id = save_user_session(request, session, SESSION)
     response = HttpResponseRedirect("/hello")
-    response.set_cookie("SESSION_ID", session_id)
+    response.set_cookie("SESSION_ID" or " SESSION_ID", session_id)
     return response
 
 
@@ -86,3 +86,31 @@ def handle_job(request):
         msg = cont_html.format(name=name, started=started, ended=ended)
         html += msg
     return HttpResponse(html)
+
+
+@require_http_methods(["GET", "POST"])
+def handle_theme(request):
+    def handle_theme_get():
+        theme = get_theme(request)
+
+        con_html = get_content(settings.PAGES_DIR / "theme" / "index.html")
+        style_html = get_content(settings.PAGES_DIR / "theme" / "theme.html")
+
+        kw = {
+            "style": style_html,
+            "class": theme
+        }
+        html = con_html.format(**kw)
+        return HttpResponse(html)
+
+    def handle_theme_post():
+        switch_theme(request)
+        return redirect("/theme/")
+
+    switcher = {
+        "GET": handle_theme_get,
+        "POST": handle_theme_post,
+    }
+
+    handler = switcher[request.method]
+    return handler()

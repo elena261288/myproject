@@ -7,7 +7,7 @@ from project.views import (
     handle_index,
     handle_skills,
     handle_job,
-    handle_hello,
+    handle_hello, handle_theme,
 )
 
 urlpatterns = [
@@ -18,4 +18,5 @@ urlpatterns = [
     path("education/", handle_education),
     path("skills/", handle_skills),
     path("job/", handle_job),
+    path("theme/", handle_theme),
 ]

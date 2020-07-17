@@ -93,3 +93,14 @@ def get_form(request):
 
         result[key] = values
     return result
+
+
+def get_theme(request):
+    default = "bright"
+    return request.session.get("theme", default)
+
+
+def switch_theme(request):
+    current = get_theme(request)
+    new = "dark" if current == "bright" else "bright"
+    request.session["theme"] = new
