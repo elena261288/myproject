@@ -1,42 +1,54 @@
 import json
+import os
 from urllib.parse import parse_qs
 
-from django.urls import path
-from http.server import SimpleHTTPRequestHandler
 
-from httpie.output.formatters import headers
-
-from project.constants import SESSION
-
-
-def get_content(request, fp):
+def get_content(fp):
     with fp.open("r", encoding="utf-8") as src:
         con = src.read()
         return con
 
 
-def load_json_file(request, fj):
+def load_json_file(fj):
     with fj.open("r") as j:
         return json.load(j)
 
 
-def load_user_session(request):
-    session_id = get_session_id()
+def load_user_session(request, file):
+    session_id = get_session_id(request)
     if not session_id:
         return {}
-    session = get_json(SESSION)
+    session = get_json(file)
     return session.get(session_id, {})
 
 
 def get_session_id(request):
-    cookie = headers.get("Cookie")
+    cookie = request.headers.get("Cookie")
     if not cookie:
         return {}
     cookie = cookie.split(";")[0]
+
     return cookie
 
 
-def get_json(request, file_inf):
+def save_user_session(request, session, fj):
+    session_id = get_session_id(request) or os.urandom(16).hex()
+    sessions = get_json(fj)
+    sessions[session_id] = session
+    save_id(fj, sessions)
+
+    return session_id
+
+
+def save_id(file, id):
+    with file.open("w") as fp:
+        json.dump(id, fp)
+
+
+
+
+
+def get_json(file_inf):
     try:
         with file_inf.open("r", encoding="utf-8") as usf:
             return json.load(usf)
@@ -44,7 +56,7 @@ def get_json(request, file_inf):
         return {}
 
 
-def build_query_args(request):  # разбиваем qs на словарь qs
+def build_query_args(path):  # разбиваем qs на словарь qs
     _path, *qs = path.split("?")
     args = {}
 
@@ -54,7 +66,7 @@ def build_query_args(request):  # разбиваем qs на словарь qs
     qs = qs[0]  # преобразовали из списка в строку
     qs = parse_qs(qs)
 
-    for key, value in qs.items():  # для каждого картежа "ключ-знач" выполнить...
+    for key, value in qs.items():
         if not value:
             continue
 
@@ -62,9 +74,22 @@ def build_query_args(request):  # разбиваем qs на словарь qs
     return args
 
 
-def build_name(request, query_args):
+def build_name(query_args):
     return query_args.get("name", "friend")
 
 
-def build_age(request, query_args):
+def build_age(query_args):
     return query_args.get("age")
+
+def get_form(request):
+    #content_length = int(request.headers["Content-Length"])
+    #data = request.rfile.read(content_length)
+    #payload = data.decode()
+    #qs = parse_qs(payload)
+    result = {}
+    for key, values in request.POST.items():
+        if not values:
+            continue
+
+        result[key] = values
+    return result

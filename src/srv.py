@@ -8,8 +8,10 @@ from urllib.parse import parse_qs
 
 from constants import COUNTER, MYPROJECT_DIR, PAGES_DIR, PORT, SESSION
 from errors import MethodNotAllowed, NotFound, UnknownPath
-from project.constants import THEME
+#from project.constants import THEME
 from responds import respond_200, respond_302, respond_404, respond_405, respond_500
+
+
 
 print(f"port = {PORT}")
 print(f"{MYPROJECT_DIR=}")

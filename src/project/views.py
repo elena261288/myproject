@@ -1,62 +1,84 @@
+import logging
 from datetime import datetime
 
-from django.http import HttpResponse
+from django.conf import settings
+from django.http import HttpResponse, HttpRequest, HttpResponseRedirect
+from django.shortcuts import redirect
+from django.views.decorators.http import require_http_methods
 
-from project.constants import PAGES_DIR, MYPROJECT_DIR
-from project.utils import (
-    get_content,
-    load_json_file,
-    load_user_session,
-    build_query_args,
-    build_name,
-    build_age,
-)
+from project.utils import load_user_session, build_query_args, build_name, build_age, get_content, load_json_file, \
+    get_form, save_user_session
+
+SESSION = settings.PAGES_DIR / "hello" / "session.json"
 
 
-def handler_index(request):
-    html = MYPROJECT_DIR / "index.html"
-    content = get_content(request, html)
+def handle_index(request):
+    html = settings.REPO_DIR / "index.html"
+    content = get_content(html)
     return HttpResponse(content)
 
 
-def hello_GEThandler(request):
-    sessions = load_user_session(request) or build_query_args(request)
+@require_http_methods(["GET", "POST"])
+def handle_hello(request: HttpRequest):
+    logging.debug(f"request = {request}")
+
+    switcher = {
+        "GET": handle_hello_get,
+        "POST": handle_hello_post
+    }
+
+    handler = switcher[request.method]
+    return handler(request)
+
+
+def handle_hello_get(request):
+    sessions = load_user_session(request, SESSION) or build_query_args(request.path)
     name = build_name(sessions)
     age = build_age(sessions)
     born = None
     if age:
-        year = datetime.now(request).year
+        year = datetime.now().year
         born = year - int(age)
 
-    html_file = PAGES_DIR / "hello" / "index.html"
+    html_file = settings.PAGES_DIR / "hello" / "index.html"
     cont_html = get_content(html_file).format(name=name, year=born)
-    return HttpResponse(cont_html)
+    return HttpResponse(cont_html, "text/html")
 
 
-def handler_goodbye(request):
+def handle_hello_post(request):
+    form = get_form(request)
+    session = load_user_session(request, SESSION)
+    session.update(form)
+    session_id = save_user_session(request, session, SESSION)
+    response = HttpResponseRedirect("/hello")
+    response.set_cookie("SESSION_ID", session_id)
+    return response
+
+
+def handle_goodbye(request):
     time = datetime.now().hour
     parting = "day" if time in range(9, 19) else "night"
     msg = f"Good {parting}!"
     return HttpResponse(msg)
 
 
-def handler_education(request):
-    html_doc = PAGES_DIR / "education" / "index.html"
-    content = get_content(request, html_doc)
+def handle_education(request):
+    html_doc = settings.PAGES_DIR / "education" / "index.html"
+    content = get_content(html_doc)
     return HttpResponse(content)
 
 
-def handler_skills(request):
-    html = PAGES_DIR / "skills" / "index.html"
-    content = get_content(request, html)
+def handle_skills(request):
+    html = settings.PAGES_DIR / "skills" / "index.html"
+    content = get_content(html)
     return HttpResponse(content)
 
 
-def handler_job(request):
-    json_file = PAGES_DIR / "job" / "job.json"
-    html_file = PAGES_DIR / "job" / "index.html"
-    job_json = load_json_file(request, json_file)
-    cont_html = get_content(request, html_file)
+def handle_job(request):
+    json_file = settings.PAGES_DIR / "job" / "job.json"
+    html_file = settings.PAGES_DIR / "job" / "index.html"
+    job_json = load_json_file(json_file)
+    cont_html = get_content(html_file)
     html = ""
     for name, dates in job_json.items():
         started = dates["start"]

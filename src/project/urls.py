@@ -2,20 +2,20 @@ from django.contrib import admin
 from django.urls import path
 
 from project.views import (
-    handler_goodbye,
-    handler_education,
-    handler_index,
-    handler_skills,
-    handler_job,
-    hello_GEThandler,
+    handle_goodbye,
+    handle_education,
+    handle_index,
+    handle_skills,
+    handle_job,
+    handle_hello,
 )
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("", handler_index),
-    #path("hello/", hello_GEThandler),
-    path("goodbye/", handler_goodbye),
-    path("education/", handler_education),
-    path("skills/", handler_skills),
-    path("job/", handler_job),
+    path("", handle_index),
+    path("hello/", handle_hello),
+    path("goodbye/", handle_goodbye),
+    path("education/", handle_education),
+    path("skills/", handle_skills),
+    path("job/", handle_job),
 ]
