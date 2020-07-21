@@ -5,6 +5,7 @@ BASE_DIR = Path(__file__).parent.parent
 PROJECT_DIR = BASE_DIR / "project"
 REPO_DIR = BASE_DIR.parent
 PAGES_DIR = REPO_DIR / "pages"
+COUNTER = PAGES_DIR / "counter" / "counter.json"
 
 
 # Quick-start development settings - unsuitable for production
@@ -28,7 +29,10 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-]
+    "applications.goodbye.apps.GoodbyeConfig",
+    "applications.target.apps.TargetConfig",
+    "applications.education.apps.EducationConfig",
+    ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -45,7 +49,10 @@ ROOT_URLCONF = "project.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [
+            PROJECT_DIR / "templates",
+
+        ],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [

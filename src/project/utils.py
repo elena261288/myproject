@@ -1,3 +1,4 @@
+import datetime
 import json
 import os
 from urllib.parse import parse_qs
@@ -23,11 +24,11 @@ def load_user_session(request, file):
 
 
 def get_session_id(request):
+    #return request.session.get(id)
     cookie = request.headers.get("Cookie")
     if not cookie:
         return {}
     cookie = cookie.split(";")[0]
-
     return cookie
 
 
@@ -44,7 +45,12 @@ def save_id(file, id):
     with file.open("w") as fp:
         json.dump(id, fp)
 
-
+def get_json(file_inf):
+    try:
+        with file_inf.open("r", encoding="utf-8") as usf:
+            return json.load(usf)
+    except (json.JSONDecodeError, FileNotFoundError):
+        return {}
 
 
 
@@ -104,3 +110,22 @@ def switch_theme(request):
     current = get_theme(request)
     new = "dark" if current == "bright" else "bright"
     request.session["theme"] = new
+
+
+def save_data(file, args):
+    with file.open("w") as fp:
+        json.dump(args, fp)
+
+
+def stats_calculating(page, start_day, days):
+    visits_counter = 0
+
+    for day_counter in range(0, days + 1):
+        day = str(start_day - datetime.timedelta(days=day_counter))
+        if day in page:
+            visits_counter += page[day]
+
+    return visits_counter
+
+
+

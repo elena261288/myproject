@@ -55,19 +55,6 @@ def handle_hello_post(request):
     return response
 
 
-def handle_goodbye(request):
-    time = datetime.now().hour
-    parting = "day" if time in range(9, 19) else "night"
-    msg = f"Good {parting}!"
-    return HttpResponse(msg)
-
-
-def handle_education(request):
-    html_doc = settings.PAGES_DIR / "education" / "index.html"
-    content = get_content(html_doc)
-    return HttpResponse(content)
-
-
 def handle_skills(request):
     html = settings.PAGES_DIR / "skills" / "index.html"
     content = get_content(html)
