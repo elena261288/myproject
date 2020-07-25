@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}TITLE{% endblock %}</title>
+</head>
+<body>
+{% block body %}BODY{% endblock %}
+
+
+
+<div>
+    <h3><a href="{% url 'target:index' %}">My page</a></h3>
+    <ul>
+        <li><a href="/hello/">Hello</a> </li>
+        <li><a href="{% url 'goodbye:index' %}">Goodbye</a> </li>
+        <li><a href="/education/">Education</a> </li>
+        <li><a href="/job/">Works</a> </li>
+        <li><a href="/skills/">Skills</a> </li>
+    </ul>
+</div>
+</body>
+</html>

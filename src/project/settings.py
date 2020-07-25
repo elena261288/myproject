@@ -32,6 +32,9 @@ INSTALLED_APPS = [
     "applications.goodbye.apps.GoodbyeConfig",
     "applications.target.apps.TargetConfig",
     "applications.education.apps.EducationConfig",
+    "applications.skills.apps.SkillsConfig",
+    "applications.job.apps.JobConfig",
+    "applications.hello.apps.HelloConfig",
     ]
 
 MIDDLEWARE = [

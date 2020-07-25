@@ -1,0 +1,20 @@
+{% extends '_base.html' %}
+
+{% block title %} Hello page {% endblock %}
+
+{% block body %}
+    <h1 style="color: green">Hello, {{ name }}!</h1>
+    {% if year %}
+    <h2>You was born at {{ year }}</h2>
+    {% endif %}
+
+    <form method="post">
+        {{ form.as_p }}
+        <button type="submit">Send</button>
+    </form>
+
+{% endblock %}
+
+
+
+
