@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     "applications.skills.apps.SkillsConfig",
     "applications.job.apps.JobConfig",
     "applications.hello.apps.HelloConfig",
+    "applications.stats.apps.StatsConfig",
     ]
 
 MIDDLEWARE = [

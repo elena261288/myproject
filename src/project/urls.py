@@ -15,5 +15,5 @@ urlpatterns = [
     path("skills/", include("applications.skills.urls")),
     path("job/", include("applications.job.urls")),
     path("theme/", handle_theme),
-    #path("stats/", include("applications.stats.urls")),
+    path("stats/", include("applications.stats.urls")),
 ]
