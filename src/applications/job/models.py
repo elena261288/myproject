@@ -4,6 +4,7 @@ from typing import Optional
 
 from project.models import Model
 
+
 @dataclass
 class Jobs(Model):
     company: Optional[str] = None

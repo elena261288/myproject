@@ -2,7 +2,8 @@ import json
 import os
 from dataclasses import dataclass, asdict
 from datetime import date, datetime
-from typing import Callable
+from pathlib import Path
+from typing import Callable, Optional, Tuple, Union, Dict, Generator
 
 from django.conf import settings
 
@@ -13,17 +14,17 @@ class ModelError(Exception):
 
 @dataclass
 class Model:
-    __dataclass_fields__ = None
-    pk = None
+    pk: Optional[str] = None
 
     __json_file__ = None
+    __storage__ = (settings.REPO_DIR / "storage").resolve()
 
     @classmethod
-    def all(cls):
+    def all(cls) -> Tuple["Model"]:
         return tuple(cls._build_objects())
 
     @classmethod
-    def one(cls, object_id):
+    def one(cls, object_id) -> Union["Model"]:
         try:
             obj = next(cls._build_objects(lambda record: record[0] == object_id))
         except StopIteration:
@@ -31,37 +32,34 @@ class Model:
 
         return obj
 
-    def save(self):
+    def save(self) -> None:
         self._setup_pk()
-
-        content = self._load_content()
+        content = self._load()
         dct = asdict(self)
-
-        try:
-            del dct["pk"]
-        except KeyError:
-            pass
-
+        self._shadow_pk(dct)
         content[self.pk] = dct
-        self._store_content(content)
 
-    def delete(self):
-        content = self._load_content()
+        self._store(content)
 
+    def delete(self) -> None:
+        content = self._load()
         if self.pk not in content:
             return
 
         del content[self.pk]
-        self._store_content(content)
+        self._store(content)
 
         self.pk = None
 
     @classmethod
-    def source(cls):
+    def delete_all(cls) -> None:
+        cls._store({})
+
+    @classmethod
+    def source(cls) -> Path:
         if not cls.__json_file__:
             raise TypeError(f"unbound source for {cls}")
-        src = settings.REPO_DIR / "storage"/cls.__json_file__
-        src = src.resolve()
+        src = (cls.__storage__ / cls.__json_file__).resolve()
         return src
 
     def _setup_pk(self):
@@ -70,17 +68,23 @@ class Model:
 
         self.pk = os.urandom(16).hex()
 
+    @staticmethod
+    def _shadow_pk(dct: Dict) -> None:
+        try:
+            del dct["pk"]
+        except KeyError:
+            pass
 
     @classmethod
-    def _build_objects(cls, predicate: Callable = lambda _x: 1):
-         content = cls._load_content()
+    def _build_objects(cls, predicate: Callable = lambda _x: 1) -> Generator["Model", None, None]:
+         content = cls._load()
 
          result = (cls(**kw) for kw in cls._build_kws(content, predicate))
 
          yield from result
 
     @ classmethod
-    def _build_kws(cls, content, predicate = lambda _x: 1):
+    def _build_kws(cls, content: Dict, predicate: Callable = lambda _x: 1) -> Generator[Dict, None, None]:
         for object_id, fields in filter(predicate, content.items()):
             kw = {}
             for field, field_params in cls.__dataclass_fields__.items():
@@ -91,7 +95,7 @@ class Model:
             yield kw
 
     @classmethod
-    def _load_content(cls):
+    def _load(cls) -> Dict:
         try:
             with cls.source().open("r") as src:
                 payload = src.read()
@@ -109,13 +113,13 @@ class Model:
         return content
 
     @classmethod
-    def _store_content(cls, content):
+    def _store(cls, content: Dict) -> None:
         cleaned_content = cls._clean_content(content)
         with cls.source().open("w") as dst:
             json.dump(cleaned_content, dst)
 
     @classmethod
-    def _validate_fields(cls, kwargs):
+    def _validate_fields(cls, kwargs: Dict):
         updated_set = set(kwargs)
         allowed_set = set(cls.__dataclass_fields__)
         diff = updated_set - allowed_set
@@ -123,23 +127,32 @@ class Model:
             raise ValueError(f"fields {sorted(diff)} are not supported by {cls}")
 
     @classmethod
-    def _clean_content(cls, content):
+    def _clean_content(cls, content: Dict):
         result = {}
 
         for key, value in content.items():
-            if isinstance(value, (date, datetime)):
-                value = value.strftime("%Y-%m-%d")
+            if isinstance(value, datetime):
+                new_value = value.strftime("%Y-%m-%d %H:%M:%S")
+            elif isinstance(value, date):
+                new_value = value.strftime("%Y-%m-%d")
             elif isinstance(value, dict):
-                value = cls._clean_content(value)
-            result[key] = value
+                new_value = cls._clean_content(value)
+            else:
+                new_value = value
+
+            result[key] = new_value
 
         return result
 
     @classmethod
-    def _build_value(cls,value, field_type):
+    def _build_value(cls, value, field_type):
         if issubclass(date, field_type.__args__):
-            return datetime.strptime(value, "%Y-%m-%d").date()
-        return value
+            new_value = datetime.strptime(value, "%Y-%m-%d").date()
+        elif issubclass(datetime, field_type.__args__):
+            new_value = datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
+        else:
+            new_value = value
+        return new_value
 
 
 

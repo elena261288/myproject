@@ -17,3 +17,4 @@ urlpatterns = [
     path("theme/", handle_theme),
     path("stats/", include("applications.stats.urls")),
 ]
+
