@@ -5,7 +5,7 @@
     <div class="all">
             {% for job in object_list %}
                 <article>
-                    <a href="{% url 'job:single' job.pk}/"><h2>{{ job.company }}, {{job.position}}</h2></a>
+                    <a href="{% url 'job:single' job.pk %}"><h2>{{ job.company }}, {{job.position}}</h2></a>
                     <strong>{{ job.started }} ~ {{ job.ended }}</strong>
                     <hr>
                     <p>{{ job.description }}</p>
