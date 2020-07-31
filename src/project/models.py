@@ -146,7 +146,9 @@ class Model:
 
     @classmethod
     def _build_value(cls, value, field_type):
-        if issubclass(date, field_type.__args__):
+        if value is None:
+            new_value = None
+        elif issubclass(date, field_type.__args__):
             new_value = datetime.strptime(value, "%Y-%m-%d").date()
         elif issubclass(datetime, field_type.__args__):
             new_value = datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
