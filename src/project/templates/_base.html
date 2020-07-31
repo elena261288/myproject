@@ -3,8 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}TITLE{% endblock %}</title>
+    <style>
+        article {
+            border: 1px darkseagreen solid;
+            margin: 2rem;
+            padding: 1rem;
+        }
+
+        .all > article {
+            max-width: 20rem;
+        }
+
+        .all {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .bright {
+            background-color: white;
+            color: darkblue;
+        }
+
+        .dark {
+            background-color: black;
+            color: white;
+        }
+
+        .stats-container {
+            display: grid;
+            font-size: 0.8rem;
+            font-family: "Bitstream Vera Sans Mono", Monaco, "Courier New", Courier, monospace;
+            grid-template-columns: [at] 15% [method] 5% [code] 5% [tm] 10% [cl] 10% [url] 55%;
+            grid-template-rows: auto;
+        }
+
+        .si {
+            padding: 0;
+            margin: 0;
+        }
+
+        .sa {
+            grid-column-start: 1;
+            grid-column-end: 2;
+        }
+
+        .sm {
+            grid-column-start: 2;
+            grid-column-end: 3;
+        }
+
+        .sc {
+            grid-column-start: 3;
+            grid-column-end: 4;
+        }
+
+        .st {
+            grid-column-start: 4;
+            grid-column-end: 5;
+        }
+
+        .cl {
+            grid-column-start: 5;
+            grid-column-end: 6;
+        }
+
+        .su {
+            grid-column-start: 6;
+            grid-column-end: 7;
+        }
+    </style>
 </head>
-<body>
+<body class="{{ theme.value }}">
+<form action="{% url "theme:switch" %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="origin" value="{{ request.path }}">
+        <button type="submit">Switch to {{ theme_next.value }}</button>
+    </form>
 {% block body %}BODY{% endblock %}
 
 

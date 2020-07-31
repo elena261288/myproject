@@ -14,7 +14,7 @@ urlpatterns = [
     path("education/", include("applications.education.urls")),
     path("skills/", include("applications.skills.urls")),
     path("job/", include("applications.job.urls")),
-    path("theme/", handle_theme),
+    path("theme/", include("applications.theme.urls")),
     path("stats/", include("applications.stats.urls")),
 ]
 
