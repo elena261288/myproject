@@ -1,5 +1,3 @@
-from django.shortcuts import render
-
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView, RedirectView
 
@@ -14,7 +12,7 @@ class StatsView(TemplateView):
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
 
-        ctx["object_list"] = sorted(Visit.all(), key=lambda v: -v.at.timestamp())
+        ctx["object_list"] = sorted(Visit.objects.all(), key=lambda v: -v.at.timestamp())
 
         return ctx
 
@@ -23,5 +21,5 @@ class ResetView(RedirectView):
     http_method_names = ["post"]
 
     def get_redirect_url(self, *args, **kwargs):
-        Visit.delete_all()
+        Visit.objects.all().delete()
         return reverse_lazy("stats:index")

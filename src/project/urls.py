@@ -1,10 +1,6 @@
 from django.contrib import admin
-from django.urls import path, include
-
-from project.views import (
- handle_theme
-)
-
+from django.urls import path, include, re_path
+#from applications.theme.views import ThemeView
 
 urlpatterns = [
     path("admin/", admin.site.urls),

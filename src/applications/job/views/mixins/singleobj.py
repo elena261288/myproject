@@ -3,7 +3,8 @@ from typing import Dict
 
 from django import forms
 
-from project.models import Model
+#from project.models import Model
+from django.db.models import Model
 
 
 class SingleObjectMixin:
@@ -12,18 +13,17 @@ class SingleObjectMixin:
 
     def get_object_id(self):
         oid = self.kwargs[self.pk_attr]
-        print(self)
         return oid
 
     def get_object(self) -> Model:
         oid = self.get_object_id()
-        obj = self.model.one(oid)
+        obj = self.model.objects.filter(pk=oid).first()
         return obj
 
-    def get_object_dct(self) -> Dict:
-        obj = self.get_object()
-        dct = asdict(obj)
-        return dct
+    #def get_object_dct(self) -> Dict:
+    #    obj = self.get_object()
+    #    dct = asdict(obj)
+    #    return dct
 
     @classmethod
     def shadow_pk(cls, dct: Dict) -> None:

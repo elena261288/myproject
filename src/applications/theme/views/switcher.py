@@ -5,7 +5,7 @@ from applications.theme.views.mixins import ThemeMixin
 from project.forms.origin import OriginForm
 
 
-@count_stats
+#@count_stats
 class SwitchThemeView(ThemeMixin, FormView):
     http_method_names = ["post"]
     form_class = OriginForm

@@ -1,16 +1,10 @@
-from dataclasses import dataclass
-from datetime import date
-from typing import Optional
-
-from project.models import Model
+from django.db import models
 
 
-@dataclass
-class Jobs(Model):
-    company: Optional[str] = None
-    position: Optional[str] = None
-    started: Optional[date] = None
-    ended: Optional[date] = None
-    description: Optional[str] = None
+class Jobs(models.Model):
+    company = models.TextField(unique=True)
+    position = models.TextField()
+    started = models.DateField(null=True, blank=True)
+    ended = models.DateField(null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
 
-    __json_file__ = "job.json"

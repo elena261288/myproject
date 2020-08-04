@@ -1,7 +1,6 @@
 from datetime import datetime
 
 from django import forms
-from django.shortcuts import render
 from django.views.generic import FormView
 
 from applications.stats.utils import count_stats
@@ -13,7 +12,7 @@ class HelloForm(forms.Form):
     age = forms.IntegerField()
 
 
-@count_stats
+#@count_stats
 class HelloView(FormView):
     template_name = "hello/index.html"
     success_url = "/hello/"

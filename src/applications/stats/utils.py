@@ -25,6 +25,12 @@ def count_stats(view):
 
 
 def count_visit(request: HttpRequest, code: int, timing: float):
+    print(request)
+    print(datetime.now())
+    print(code)
+    print(request.method)
+    print(request.path)
+
     visit = Visit(
         at=datetime.now(),
         code=code,

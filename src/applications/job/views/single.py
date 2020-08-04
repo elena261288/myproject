@@ -1,3 +1,5 @@
+from typing import Dict
+
 from django.urls import reverse_lazy
 from django.views.generic import FormView
 
@@ -8,11 +10,20 @@ from applications.job.views.mixins import SingleObjectMixin
 from applications.stats.utils import count_stats
 
 
-@count_stats
+#@count_stats
 class SingleJobView(SingleObjectMixin, FormView):
     model = Jobs
     template_name = "job/single.html"
     form_class = JobForm
+
+    def get_object_dct(self) -> Dict:
+        obj = self.get_object()
+        dct = {"company": obj.company,
+               "position": obj.position,
+               "started": obj.started,
+               "ended": obj.ended,
+               "description": obj.description}
+        return dct
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)

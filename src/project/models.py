@@ -16,7 +16,7 @@ class ModelError(Exception):
 class Model:
     pk: Optional[str] = None
 
-    __json_file__ = None
+    #__json_file__ = None
     __storage__ = (settings.REPO_DIR / "storage").resolve()
 
     @classmethod
@@ -57,9 +57,10 @@ class Model:
 
     @classmethod
     def source(cls) -> Path:
-        if not cls.__json_file__:
-            raise TypeError(f"unbound source for {cls}")
-        src = (cls.__storage__ / cls.__json_file__).resolve()
+        #if not cls.__json_file__:
+        #    raise TypeError(f"unbound source for {cls}")
+        json_file = f"{cls.__name__.lower()}.json"
+        src = (cls.__storage__ / json_file).resolve()
         return src
 
     def _setup_pk(self):

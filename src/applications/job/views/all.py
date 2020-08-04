@@ -6,7 +6,7 @@ from applications.job.models import Jobs
 from applications.stats.utils import count_stats
 
 
-@count_stats
+#@count_stats
 class AllJobView(FormView):
     template_name = "job/all.html"
     form_class = JobForm
@@ -19,6 +19,6 @@ class AllJobView(FormView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        ctx["object_list"] = Jobs.all()
+        ctx["object_list"] = Jobs.objects.all()
         return ctx
 

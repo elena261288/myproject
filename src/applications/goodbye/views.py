@@ -5,7 +5,7 @@ from django.views.generic import TemplateView
 from applications.stats.utils import count_stats
 
 
-@count_stats
+#@count_stats
 class GoodbyeView(TemplateView):
     template_name = "goodbye/index.html"
 

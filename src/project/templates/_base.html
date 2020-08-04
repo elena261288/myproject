@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>{% block title %}TITLE{% endblock %}</title>
     <style>
-        article {
+    article {
             border: 1px darkseagreen solid;
             margin: 2rem;
             padding: 1rem;
@@ -20,16 +20,17 @@
             flex-wrap: wrap;
             justify-content: center;
         }
-
-        .bright {
-            background-color: white;
-            color: darkblue;
+       .bright {
+        background-color: white;
+        color: black
         }
+        .bright > h1 {color: green}
 
         .dark {
-            background-color: black;
+            background-color: teal;
             color: white;
         }
+        .dark > h1 {color: pink}
 
         .stats-container {
             display: grid;
@@ -76,10 +77,10 @@
     </style>
 </head>
 <body class="{{ theme.value }}">
-<form action="{% url "theme:switch" %}" method="post">
+    <form method="post" action="{% url 'theme:switcher' %}">
         {% csrf_token %}
         <input type="hidden" name="origin" value="{{ request.path }}">
-        <button type="submit">Switch to {{ theme_next.value }}</button>
+        <button type="submit">Switch theme</button>
     </form>
 {% block body %}BODY{% endblock %}
 

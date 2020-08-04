@@ -1,16 +1,11 @@
-from dataclasses import dataclass
-from datetime import datetime
-from typing import Optional
-
-from project.models import Model
+from django.db import models
 
 
-@dataclass
-class Visit(Model):
-    at: Optional[datetime] = None
-    code: Optional[int] = None
-    method: Optional[str] = None
-    tm: Optional[float] = None
-    url: Optional[str] = None
+class Visit(models.Model):
+    at = models.DateTimeField()
+    cl = models.PositiveIntegerField()
+    code = models.PositiveIntegerField()
+    method = models.TextField()
+    tm = models.FloatField()
+    url = models.URLField()
 
-    __json_file__ = "stats.json"
