@@ -6,7 +6,7 @@ from applications.job.models import Jobs
 from applications.stats.utils import count_stats
 
 
-#@count_stats
+@count_stats
 class AllJobView(FormView):
     template_name = "job/all.html"
     form_class = JobForm

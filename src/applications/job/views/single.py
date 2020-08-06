@@ -10,7 +10,7 @@ from applications.job.views.mixins import SingleObjectMixin
 from applications.stats.utils import count_stats
 
 
-#@count_stats
+@count_stats
 class SingleJobView(SingleObjectMixin, FormView):
     model = Jobs
     template_name = "job/single.html"

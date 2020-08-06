@@ -12,7 +12,7 @@ class HelloForm(forms.Form):
     age = forms.IntegerField()
 
 
-#@count_stats
+@count_stats
 class HelloView(FormView):
     template_name = "hello/index.html"
     success_url = "/hello/"
