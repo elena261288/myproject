@@ -1,7 +1,9 @@
 {% extends "_base.html" %}
 {% block title %}All work experience{% endblock %}
 {% block body %}
+
     <h1>Experience:</h1>
+    <a href="{% url 'job:add'%}" ><button>Add new job</button></a>
     <div class="all">
             {% for job in object_list %}
                 <article>
@@ -13,10 +15,6 @@
             {% endfor %}
     </div>
     <hr>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Add new job</button>
-    </form>
+
 
 {% endblock %}

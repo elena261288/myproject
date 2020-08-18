@@ -9,3 +9,5 @@ class Visit(models.Model):
     tm = models.FloatField(null=True, blank=True)
     url = models.URLField(null=True, blank=True)
 
+    class Meta:
+        ordering = ['-at']

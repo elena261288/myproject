@@ -8,10 +8,9 @@
             <strong>{{ object.started }} ~ {{ object.ended }}</strong>
             <hr>
             <p>{{ object.description }}</p>
-            <form method="post" action="{% url 'job:delete' object.pk %}">
-                {% csrf_token %}
-                <button type="submit">Delete</button>
-            </form>
+            <a href="{% url 'job:delete' object.pk %}">
+                <button>Delete</button>
+            </a>
         </article>
     </div>
     </hr>
