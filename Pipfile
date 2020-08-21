@@ -12,6 +12,9 @@ ipython = "*"
 django = "*"
 isort = "*"
 make = "*"
+psycopg2-binary = "*"
+dj-database-url = "*"
+dynaconf = {extras = ["yaml"], version = "*"}
 
 [requires]
 python_version = "3.8"

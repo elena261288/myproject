@@ -1,5 +1,7 @@
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 from pathlib import Path
+import os
+import dj_database_url
 
 BASE_DIR = Path(__file__).parent.parent
 PROJECT_DIR = BASE_DIR / "project"
@@ -77,11 +79,12 @@ WSGI_APPLICATION = "project.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
+development_database_url = "postgresql://postgres:1@localhost:5432/tms"
+database_url = os.getenv("DATABASE_URL", development_database_url)
+database_params = dj_database_url.parse(database_url)
+
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": (REPO_DIR / "db.sqlite3").resolve().as_posix(),
-    }
+    "default": database_params,
 }
 
 
