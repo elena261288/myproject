@@ -8,7 +8,6 @@ from applications.stats.utils import count_stats
 @count_stats
 class StatsView(ListView):
     template_name = "stats/index.html"
-    #model = Visit
     queryset = Visit.objects.all()
 
 

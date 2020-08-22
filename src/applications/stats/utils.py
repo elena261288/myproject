@@ -43,3 +43,6 @@ def count_visit(request: HttpRequest, code: int, timing: float, content_length: 
         url=request.path
     )
     visit.save()
+
+
+

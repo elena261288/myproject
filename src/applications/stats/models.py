@@ -1,4 +1,24 @@
+from typing import Optional, NamedTuple
+
 from django.db import models
+
+
+class LimitsT(NamedTuple):
+    min: float
+    max: float
+    avg: float
+
+
+class IntervalT(NamedTuple):
+    min05: LimitsT
+    min10: LimitsT
+    h01: LimitsT
+    h24: LimitsT
+
+
+class DashboardT(NamedTuple):
+    Latency: IntervalT
+    Traffic: IntervalT
 
 
 class Visit(models.Model):
