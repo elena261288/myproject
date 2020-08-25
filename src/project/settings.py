@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "applications.hello.apps.HelloConfig",
     "applications.stats.apps.StatsConfig",
     "applications.theme.apps.ThemeConfig",
+    "applications.blog.apps.BlogConfig",
     ]
 
 MIDDLEWARE = [
