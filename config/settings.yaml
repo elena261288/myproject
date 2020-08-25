@@ -1,7 +1,9 @@
 default:
   SECRET_KEY: ""
+  DATABASE_URL: ""
   ALLOWED_HOSTS: []
   DEBUG: false
+  PORT: 0
 
 development:
   SECRET_KEY: "1"
@@ -9,6 +11,7 @@ development:
     - localhost
     - 127.0.0.1
   DEBUG: true
+  PORT: 8000
 
 heroku:
   ALLOWED_HOSTS:

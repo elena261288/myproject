@@ -79,8 +79,11 @@ WSGI_APPLICATION = "project.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-development_database_url = "postgresql://postgres:1@localhost:5432/tms"
-database_url = os.getenv("DATABASE_URL", development_database_url)
+
+database_url = _ds.DATABASE_URL
+if _ds.ENV_FOR_DYNACONF == "heroku":
+    database_url = os.getenv("DATABASE_URL")
+
 database_params = dj_database_url.parse(database_url)
 
 DATABASES = {
