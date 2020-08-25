@@ -2,6 +2,7 @@
 from pathlib import Path
 import os
 import dj_database_url
+from dynaconf import settings as _ds
 
 BASE_DIR = Path(__file__).parent.parent
 PROJECT_DIR = BASE_DIR / "project"
@@ -14,13 +15,12 @@ COUNTER = PAGES_DIR / "counter" / "counter.json"
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "1"
+SECRET_KEY = _ds.SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = _ds.DEBUG
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "elenamoiseeva.herokuapp.com"]
-
+ALLOWED_HOSTS = _ds.ALLOWED_HOSTS
 
 # Application definition
 
