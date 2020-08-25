@@ -1,0 +1,16 @@
+default:
+  SECRET_KEY: ""
+  ALLOWED_HOSTS: []
+  DEBUG: false
+
+development:
+  SECRET_KEY: "1"
+  ALLOWED_HOSTS:
+    - localhost
+    - 127.0.0.1
+  DEBUG: true
+
+heroku:
+  ALLOWED_HOSTS:
+    - elenamoiseeva.herokuapp.com
+  DEBUG: false
