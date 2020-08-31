@@ -1,0 +1,22 @@
+{% extends "_base.html" %}
+{% block title %}Blog {{ object.theme }}{% endblock %}
+{% block body %}
+    <div class="single">
+        <p><a href="{% url 'blog:all' %}"> All blogs</a></p>
+        <article>
+            <h1>{{ object.theme }}</h1>
+            <strong>{{ object.create }}</strong>
+            <hr>
+            <p>{{ object.content }}</p>
+            <a href="{% url 'blog:delete' object.pk %}">
+                <button>Delete</button>
+            </a>
+        </article>
+    </div>
+    </hr>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Update</button>
+    </form>
+{% endblock %}
