@@ -13,5 +13,6 @@ urlpatterns = [
     path("theme/", include("applications.theme.urls")),
     path("stats/", include("applications.stats.urls")),
     path("blog/", include("applications.blog.urls")),
+    path("user/", include("applications.onboarding.urls")),
 ]
 

@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "applications.stats.apps.StatsConfig",
     "applications.theme.apps.ThemeConfig",
     "applications.blog.apps.BlogConfig",
+    "applications.onboarding.apps.OnboardingConfig"
     ]
 
 MIDDLEWARE = [
