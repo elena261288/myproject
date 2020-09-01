@@ -82,7 +82,13 @@
         <input type="hidden" name="origin" value="{{ request.path }}">
         <button type="submit">Switch theme</button>
     </form>
-{% block body %}BODY{% endblock %}
+    {% if user.is_authenticated %}
+        <a href="{% url 'onboarding:index' %}"><button>Profile</button></a>
+        <a href="{% url 'onboarding:sign-out' %}"><button>Sign Out</button></a>
+    {% else %}
+        <a href="{% url 'onboarding:sign-in' %}"><button>Sign In</button></a>
+    {% endif %}
+    {% block body %}BODY{% endblock %}
 
 
 
@@ -93,9 +99,11 @@
         <li><a href="{% url 'goodbye:index' %}">Goodbye</a> </li>
         <li><a href="{% url 'education:index' %}">Education</a> </li>
         <li><a href="{% url 'job:all' %}">Job</a> </li>
-        <li><a href="{% url 'skills:index' %}">Skills</a> </li>
-        <li><a href="{% url 'stats:index' %}">Stats</a> </li>
+        <li><a href="{% url 'skills:index' %}">Skills</a></li>
         <li><a href="{% url 'blog:all' %}">Blog</a> </li>
+        <li><a href="{% url 'onboarding:index' %}">Profile</a> </li>
+        <li><a href="{% url 'stats:index' %}">Stats</a> </li>
+
     </ul>
 </div>
 </body>

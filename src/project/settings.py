@@ -2,6 +2,7 @@
 from pathlib import Path
 import os
 import dj_database_url
+from django.urls import reverse_lazy
 from dynaconf import settings as _ds
 
 BASE_DIR = Path(__file__).parent.parent
@@ -124,3 +125,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = "/static/"
+
+LOGIN_URL = reverse_lazy("onboarding:sign-in")
+LOGIN_REDIRECT_URL = reverse_lazy("target:index")
