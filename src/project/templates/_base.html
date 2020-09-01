@@ -87,6 +87,7 @@
         <a href="{% url 'onboarding:sign-out' %}"><button>Sign Out</button></a>
     {% else %}
         <a href="{% url 'onboarding:sign-in' %}"><button>Sign In</button></a>
+        <a href="{% url 'onboarding:sign-up' %}"><button>Sign Up</button></a>
     {% endif %}
     {% block body %}BODY{% endblock %}
 
