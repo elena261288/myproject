@@ -7,7 +7,7 @@ from django.urls import reverse_lazy
 from django.views.generic import TemplateView, DetailView, FormView
 from django.views.generic.edit import FormMixin, UpdateView
 
-from applications.onboarding.models import Profile
+from applications.onboarding.models import Profile, Avatar
 from applications.stats.utils import count_stats
 
 User = get_user_model()
@@ -16,6 +16,12 @@ User = get_user_model()
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
+        fields = "__all__"
+
+
+class AvatarForm(forms.ModelForm):
+    class Meta:
+        model = Avatar
         fields = "__all__"
 
 
@@ -41,12 +47,38 @@ class IndexView(CurrentUserMixin, FormMixin, LoginRequiredMixin, DetailView):
         initial = {field: getattr(self.object, field) for field in model_fields}
         return initial
 
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+
+        ctx["form_avatar"] = AvatarForm()
+
+        return ctx
+
 @count_stats
 class ProfileUpdateView(CurrentUserMixin, UpdateView):
     http_method_names = ["post"]
     form_class = ProfileForm
     model = Profile
     success_url = reverse_lazy("onboarding:index")
+
+
+@count_stats
+class ChangeAvatarView(UpdateView):
+    http_method_names = ["post"]
+    form_class = AvatarForm
+    success_url = reverse_lazy("onboarding:index")
+    model = Avatar
+
+    def get_object(self, *_args, **_kwargs):
+        if self.request.user.is_anonymous:
+            return None
+
+        queryset = self.model.objects.filter(profile_user=self.request.user)
+
+        return queryset.first()
+
+
+
 
 @count_stats
 class SignInView(LoginView):
