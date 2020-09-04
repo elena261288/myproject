@@ -1,5 +1,10 @@
 {% extends "_base.html" %}
+{% load static %}
 {% block title %}Sign Up{% endblock %}
+
+{% block head %}
+    <link href="{% static 'onboarding/sign-up.css' %}" rel="stylesheet" type="text/css">
+{% endblock %}
 
 {% block body %}
     <form method="post">

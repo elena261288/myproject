@@ -48,7 +48,7 @@ class HelloView(FormView):
         return super().form_valid(form)
 
     def build_name_age(self):
-        sessions = load_user_session(self.request) or build_query_args(self.request.path)
+        sessions = load_user_session(self.request) or build_query_args(self.request)
         name = build_name(sessions)
         age = build_age(sessions)
         return name, age

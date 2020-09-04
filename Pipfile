@@ -15,6 +15,9 @@ make = "*"
 psycopg2-binary = "*"
 dj-database-url = "*"
 dynaconf = {extras = ["yaml"], version = "*"}
+whitenoise = "*"
+boto3 = "*"
+django-storages = "*"
 
 [requires]
 python_version = "3.8"

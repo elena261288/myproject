@@ -1,80 +1,12 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}TITLE{% endblock %}</title>
-    <style>
-    article {
-            border: 1px darkseagreen solid;
-            margin: 2rem;
-            padding: 1rem;
-        }
-
-        .all > article {
-            max-width: 20rem;
-        }
-
-        .all {
-            display: flex;
-            flex-direction: row;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-       .bright {
-        background-color: Honeydew;
-        color: DarkSlateGrey
-        }
-        .bright > h1 {color: green}
-
-        .dark {
-            background-color: teal;
-            color: white;
-        }
-        .dark > h1 {color: LightPink}
-
-        .stats-container {
-            display: grid;
-            font-size: 0.8rem;
-            font-family: "Bitstream Vera Sans Mono", Monaco, "Courier New", Courier, monospace;
-            grid-template-columns: [at] 15% [method] 5% [code] 5% [tm] 10% [cl] 10% [url] 55%;
-            grid-template-rows: auto;
-        }
-
-        .si {
-            padding: 0;
-            margin: 0;
-        }
-
-        .sa {
-            grid-column-start: 1;
-            grid-column-end: 2;
-        }
-
-        .sm {
-            grid-column-start: 2;
-            grid-column-end: 3;
-        }
-
-        .sc {
-            grid-column-start: 3;
-            grid-column-end: 4;
-        }
-
-        .st {
-            grid-column-start: 4;
-            grid-column-end: 5;
-        }
-
-        .cl {
-            grid-column-start: 5;
-            grid-column-end: 6;
-        }
-
-        .su {
-            grid-column-start: 6;
-            grid-column-end: 7;
-        }
-    </style>
+    <link href="{% static 'main.css' %}" rel="stylesheet" type="text/css">
+    {% block head %}
+    {% endblock %}
 </head>
 <body class="{{ theme.value }}">
     <form method="post" action="{% url 'theme:switcher' %}">
