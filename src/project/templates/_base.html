@@ -4,9 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}TITLE{% endblock %}</title>
-    <link href="{% static 'main.css' %}" rel="stylesheet" type="text/css">
     {% block head %}
     {% endblock %}
+    <link href="{% static 'main.css' %}" rel="stylesheet" type="text/css">
 </head>
 <body class="{{ theme.value }}">
     <form method="post" action="{% url 'theme:switcher' %}">
