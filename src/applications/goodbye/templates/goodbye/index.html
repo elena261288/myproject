@@ -1,9 +1,17 @@
+
 {% extends "_base.html" %}
+{% load static %}
 
-{% block title %}
-Goodbye page
-{% endblock %}
-
+ {% block title %}
+  Goodbye page
+ {% endblock %}
+ {% block head %}
+    <style>
+        body {
+            background: url('{% static 'goodbye/fon.jpg' %}');
+        }
+    </style>
+ {% endblock %}
 
 {% block body %}
 <div style="{% if tod == 'day' %}color: Tan{% else %}color: DarkSlateBlue{% endif %}">
