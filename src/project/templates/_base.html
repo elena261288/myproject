@@ -9,14 +9,17 @@
     <link href="{% static 'main.css' %}" rel="stylesheet" type="text/css">
 </head>
 <body class="{{ theme.value }}">
-{% if not request.user.is_anonymous %}
-    <img src="{{ request.user.profile.avatar.original.url }}" alt="avatar" width="200rem">
-{% endif %}
     <form method="post" action="{% url 'theme:switcher' %}">
         {% csrf_token %}
         <input type="hidden" name="origin" value="{{ request.path }}">
         <button type="submit">Switch theme</button>
     </form>
+    <p>
+    {% if not request.user.is_anonymous %}
+        <img src="{{ request.user.profile.avatar.original.url }}" alt="avatar" width="200rem">
+    {% endif %}
+    </p>
+    <p>
     {% if user.is_authenticated %}
         <a href="{% url 'onboarding:index' %}"><button>Profile</button></a>
         <a href="{% url 'onboarding:sign-out' %}"><button>Sign Out</button></a>
@@ -24,6 +27,8 @@
         <a href="{% url 'onboarding:sign-in' %}"><button>Sign In</button></a>
         <a href="{% url 'onboarding:sign-up' %}"><button>Sign Up</button></a>
     {% endif %}
+    </p>
+
     {% block body %}BODY{% endblock %}
 
 
