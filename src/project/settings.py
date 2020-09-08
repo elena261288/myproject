@@ -5,6 +5,8 @@ import os
 import dj_database_url
 from django.urls import reverse_lazy
 from dynaconf import settings as _ds
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
 
 BASE_DIR = Path(__file__).parent.parent
 PROJECT_DIR = BASE_DIR / "project"
@@ -148,3 +150,14 @@ AWS_S3_OBJECT_PARAMETERS = {"ACL": "public-read"}
 AWS_S3_REGION_NAME = _ds.AWS_S3_REGION_NAME
 AWS_SECRET_ACCESS_KEY = _ds.AWS_SECRET_ACCESS_KEY
 AWS_STORAGE_BUCKET_NAME = _ds.AWS_STORAGE_BUCKET_NAME
+
+if not DEBUG:
+    sentry_sdk.init(
+        dsn="https://e77d6471e7664005981d411df62801e7@o445353.ingest.sentry.io/5421645",
+        integrations=[DjangoIntegration()],
+        traces_sample_rate=1.0,
+
+        # If you wish to associate users to errors (assuming you are using
+        # django.contrib.auth) you may enable sending PII data.
+        send_default_pii=True
+    )
