@@ -1,19 +1,30 @@
 default:
   SECRET_KEY: ""
+  SENTRY_DSN: ""
   DATABASE_URL: ""
   ALLOWED_HOSTS: []
   DEBUG: false
   PORT: 0
+  AWS_ACCESS_KEY_ID: ""
+  AWS_S3_AVATARS_LOCATION: ""
+  AWS_S3_REGION_NAME: ""
+  AWS_SECRET_ACCESS_KEY: ""
+  AWS_STORAGE_BUCKET_NAME: ""
 
 development:
+  AWS_ACCESS_KEY_ID: "AKIAJVDZBKMNX7LOEXYQ"
+  AWS_S3_AVATARS_LOCATION: "avatars-dev"
+  AWS_S3_REGION_NAME: "eu-central-1"
+  AWS_STORAGE_BUCKET_NAME: "tms-myproject"
   SECRET_KEY: "1"
-  ALLOWED_HOSTS:
-    - localhost
-    - 127.0.0.1
   DEBUG: true
   PORT: 8000
 
 heroku:
   ALLOWED_HOSTS:
-    - elenamoiseeva.herokuapp.com
+    - "elenamoiseeva.herokuapp.com"
+  AWS_ACCESS_KEY_ID: "AKIAJ5FO7DUGUEWO75RA"
+  AWS_S3_AVATARS_LOCATION: "avatars-heroku"
+  AWS_S3_REGION_NAME: "eu-central-1"
+  AWS_STORAGE_BUCKET_NAME: "tms-myproject"
   DEBUG: false

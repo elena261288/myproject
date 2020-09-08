@@ -1,4 +1,5 @@
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+from itertools import chain
 from pathlib import Path
 import os
 import dj_database_url
@@ -21,7 +22,9 @@ SECRET_KEY = _ds.SECRET_KEY
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = _ds.DEBUG
 
-ALLOWED_HOSTS = _ds.ALLOWED_HOSTS
+INTERNAL_IPS = ["127.0.0.1"]
+INTERNAL_HOSTS = ["localhost"]
+ALLOWED_HOSTS = list(chain(_ds.ALLOWED_HOSTS or [], INTERNAL_IPS, INTERNAL_HOSTS))
 
 # Application definition
 
@@ -135,3 +138,13 @@ if not DEBUG:
 
 LOGIN_URL = reverse_lazy("onboarding:sign-in")
 LOGIN_REDIRECT_URL = reverse_lazy("target:index")
+
+
+AWS_ACCESS_KEY_ID = _ds.AWS_ACCESS_KEY_ID
+AWS_QUERYSTRING_AUTH = False
+AWS_S3_ADDRESSING_STYLE = "path"
+AWS_S3_AVATARS_LOCATION = _ds.AWS_S3_AVATARS_LOCATION
+AWS_S3_OBJECT_PARAMETERS = {"ACL": "public-read"}
+AWS_S3_REGION_NAME = _ds.AWS_S3_REGION_NAME
+AWS_SECRET_ACCESS_KEY = _ds.AWS_SECRET_ACCESS_KEY
+AWS_STORAGE_BUCKET_NAME = _ds.AWS_STORAGE_BUCKET_NAME
