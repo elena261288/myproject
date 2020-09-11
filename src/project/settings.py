@@ -153,7 +153,7 @@ AWS_STORAGE_BUCKET_NAME = _ds.AWS_STORAGE_BUCKET_NAME
 
 if not DEBUG:
     sentry_sdk.init(
-        dsn="https://e77d6471e7664005981d411df62801e7@o445353.ingest.sentry.io/5421645",
+        dsn=_ds.SENTRY_DSN,
         integrations=[DjangoIntegration()],
         traces_sample_rate=1.0,
 

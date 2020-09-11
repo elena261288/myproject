@@ -17,6 +17,7 @@ development:
   AWS_S3_REGION_NAME: "eu-central-1"
   AWS_STORAGE_BUCKET_NAME: "tms-myproject"
   SECRET_KEY: "1"
+  SENTRY_DSN: ""
   DEBUG: true
   PORT: 8000
 
