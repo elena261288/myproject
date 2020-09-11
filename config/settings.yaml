@@ -24,7 +24,7 @@ development:
 heroku:
   ALLOWED_HOSTS:
     - "elenamoiseeva.herokuapp.com"
-  AWS_ACCESS_KEY_ID: "AKIAJ5FO7DUGUEWO75RA"
+  AWS_ACCESS_KEY_ID: "AKIAJVDZBKMNX7LOEXYQ"
   AWS_S3_AVATARS_LOCATION: "avatars-heroku"
   AWS_S3_REGION_NAME: "eu-central-1"
   AWS_STORAGE_BUCKET_NAME: "tms-myproject"
